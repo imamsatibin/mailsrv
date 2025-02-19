@@ -28,6 +28,17 @@ sudo certbot certonly --manual -d "oxygen.my.id" -d "mail.oxygen.my.id" -d "post
 /etc/letsencrypt/live/postfixadmin.oxygen.my.id/privkey.pem
 ```
 
+Atau, lebih mudah menggunakan wildcard SSL (manual renewal)
+```
+certbot certonly --manual \
+--preferred-challenges=dns \
+--email imam@oxygen.my.id \
+--server https://acme-v02.api.letsencrypt.org/directory \
+--agree-tos \
+--manual-public-ip-logging-ok \
+-d oxygen.my.id, *.oxygen.my.id
+```
+
 ### Renewal (Manual)
 
 ```
