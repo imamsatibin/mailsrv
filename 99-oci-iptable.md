@@ -7,8 +7,12 @@ Edit pada file ini `/etc/iptables/rules.v4`
 sudo nano /etc/iptables/rules.v4
 ```
 
-Tambahkan port lain (misal 80, 443), copy saja dari `port 22` yang sudah terbuka secara default.
+Tambahkan port lain, copy saja dari `port 22` yang sudah terbuka secara default.
 Jangan lupa SAVE dan EXIT.
+
+1. HTTP = 80
+2. HTTPS = 443
+3. PostgreSQL = 5432
 
 Apply perubahan dengan.
 ```
