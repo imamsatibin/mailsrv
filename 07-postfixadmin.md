@@ -121,3 +121,87 @@ Bagian ini,
 ```
 $CONF['setup_password'] = 'hashed-password-dari-sistem';
 ```
+
+### Hubungkan dengan Postfix
+Instal dependency
+```
+sudo apt install postfix-pgsql -y
+```
+Ubah file ini 
+```
+sudo nano /etc/postfix/main.cf
+```
+Edit bagian ini
+```
+#mailbox_transport = lmtp:unix:private/dovecot-lmtp
+#mydestination = $mydomain, localhost
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+
+# Gunakan PostgreSQL sebagai backend untuk virtual mailbox
+virtual_mailbox_domains = pgsql:/etc/postfix/pgsql_virtual_domains_maps.cf
+virtual_mailbox_maps = pgsql:/etc/postfix/pgsql_virtual_mailbox_maps.cf
+virtual_alias_maps = pgsql:/etc/postfix/pgsql_virtual_alias_maps.cf
+```
+
+#### Lalu buat file domain
+```
+sudo nano /etc/postfix/pgsql_virtual_domains_maps.cf
+```
+Isinya (disesuaikan)
+```
+user = postfix
+password = password_kuat
+dbname = postfixadmin
+hosts = 127.0.0.1
+query = SELECT domain FROM domain WHERE domain='%s' AND active='1'
+```
+#### Lalu buat file mailbox
+```
+sudo nano /etc/postfix/pgsql_virtual_mailbox_maps.cf
+```
+```
+user = postfix
+password = password_kuat
+dbname = postfixadmin
+hosts = 127.0.0.1
+query = SELECT maildir FROM mailbox WHERE username='%s' AND active='1'
+```
+#### Lalu buat file alias
+```
+sudo nano /etc/postfix/pgsql_virtual_alias_maps.cf
+```
+```
+user = postfix
+password = password_kuat
+dbname = postfixadmin
+hosts = 127.0.0.1
+query = SELECT goto FROM alias WHERE address='%s' AND active='1'
+```
+
+Atur hak aksesnya.
+```
+sudo chmod 640 /etc/postfix/pgsql_*.cf
+sudo chown root:postfix /etc/postfix/pgsql_*.cf
+```
+
+#### Buat user vmail 
+```
+sudo nano /etc/postfix/main.cf
+```
+Tambahkan baris ini
+```
+virtual_mailbox_base = /var/vmail
+virtual_minimum_uid = 2000
+virtual_uid_maps = static:2000
+virtual_gid_maps = static:2000
+```
+Add user dan beri hak akses.
+```
+sudo adduser vmail --system --group --uid 2000 --disabled-login --no-create-home
+sudo mkdir /var/vmail/ && sudo chown -R vmail:vmail /var/vmail/
+```
+
+RESTART service 
+```
+sudo service postfix restart
+```
