@@ -60,5 +60,5 @@ sudo service postfix restart
 
 #### Test kirim email
 ```
-echo "Test passed, congratulations!" | sudo sendmail -s "Subject: Test Email" your.email@gmail.com
+echo -e "Subject: Hi, there.\n\nI hope this email finds you well. Thanks" | sudo sendmail your.email@gmail.com
 ```
